@@ -6,7 +6,7 @@ import select
 import json
 from threading import Thread, Timer
 
-MAX_CONTAINER_LENGTH = 1 * 60
+MAX_CONTAINER_LENGTH = 10 * 60
 
 BUF_SIZE = 1024
 
