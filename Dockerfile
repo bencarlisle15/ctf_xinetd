@@ -15,10 +15,10 @@ RUN echo "Blocked by ctf_xinetd" > /etc/banner_fail
 
 RUN chmod +x /start.sh
 
-ENV REMOTE_PORT 1338
-ENV CLIENT_PORT 5000
-ENV IMAGE aa-1
-ENV DOCKER_NET aa-net
+ARG REMOTE_PORT
+ARG CLIENT_POR
+ARG IMAGE
+ARG DOCKER_NET
 EXPOSE $REMOTE_PORT
 
 CMD ["/start.sh"]

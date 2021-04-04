@@ -38,21 +38,28 @@ def get_container_ip(remote_ip):
         except docker.errors.NotFound:
             container_id = create_new_container(client, remote_ip)
     print("Container: " + container_id)
-    container = client.containers.get(container_id)
-    ip = container.attrs["NetworkSettings"]["Networks"][DOCKER_NET]["IPAddress"]
-    while ip == "":
-        time.sleep(1)
+    for _ in range(30):
         container = client.containers.get(container_id)
         ip = container.attrs["NetworkSettings"]["Networks"][DOCKER_NET]["IPAddress"]
-    return ip
+        if ip != "":
+            return ip
+        time.sleep(1)
+    return None
 
 
 def connection(remote_conn, remote_ip):
     ip = get_container_ip(remote_ip)
+    if ip is None:
+        return
     with remote_conn:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_conn:
             print("Connecting to client %s:%d" % (ip, CLIENT_PORT))
-            client_conn.connect((ip, CLIENT_PORT))
+            for _ in range(30):
+                try:
+                    client_conn.connect((ip, CLIENT_PORT))
+                    break
+                except:
+                    time.sleep(1)
             remote_conn.setblocking(0)
             client_conn.setblocking(0)
 
