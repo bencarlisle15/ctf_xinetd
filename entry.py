@@ -24,8 +24,12 @@ RUN_ARGS = json.loads(run_args_string)
 
 IP_LOOKUP = {}
 
-def kill_container(container):
+def kill_container(remote_ip):
+    container_id = IP_LOOKUP[remote_ip]
+    print("Killing container %s" % container_id)
     del IP_LOOKUP[remote_ip]
+    client = docker.from_env()
+    container = client.containers.get(container_id)
     container.kill()
 
 def create_new_container(client, remote_ip):
@@ -37,7 +41,7 @@ def create_new_container(client, remote_ip):
     )
     container_id = container.attrs["Id"]
     IP_LOOKUP[remote_ip] = container_id
-    Timer(MAX_CONTAINER_LENGTH, kill_container, [container]).start()
+    Timer(MAX_CONTAINER_LENGTH, kill_container, [remote_ip]).start()
     return container_id
 
 def get_container_ip(remote_ip):
