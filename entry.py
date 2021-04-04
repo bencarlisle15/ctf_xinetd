@@ -3,6 +3,7 @@ import sys
 import docker
 import time
 import select
+import json
 from threading import Thread
 
 BUF_SIZE = 1024
@@ -15,12 +16,17 @@ IMAGE = sys.argv[3]
 
 DOCKER_NET = sys.argv[4]
 
+run_args_string = sys.argv[5]
+
+RUN_ARGS = json.loads(run_args_string)
+
 IP_LOOKUP = {}
 
 def create_new_container(client, remote_ip):
     container = client.containers.run(
         IMAGE,
         network=DOCKER_NET,
+        **RUN_ARGS,
         detach=True
     )
     container_id = container.attrs["Id"]
