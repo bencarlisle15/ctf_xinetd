@@ -4,7 +4,9 @@ import docker
 import time
 import select
 import json
-from threading import Thread
+from threading import Thread, Timer
+
+MAX_CONTAINER_LENGTH = 1 * 60
 
 BUF_SIZE = 1024
 
@@ -22,6 +24,10 @@ RUN_ARGS = json.loads(run_args_string)
 
 IP_LOOKUP = {}
 
+def kill_container(container):
+    del IP_LOOKUP[remote_ip]
+    container.kill()
+
 def create_new_container(client, remote_ip):
     container = client.containers.run(
         IMAGE,
@@ -31,6 +37,7 @@ def create_new_container(client, remote_ip):
     )
     container_id = container.attrs["Id"]
     IP_LOOKUP[remote_ip] = container_id
+    Timer(MAX_CONTAINER_LENGTH, kill_container, [container]).start()
     return container_id
 
 def get_container_ip(remote_ip):
@@ -51,7 +58,6 @@ def get_container_ip(remote_ip):
             return ip
         time.sleep(1)
     return None
-
 
 def connection(remote_conn, remote_ip):
     ip = get_container_ip(remote_ip)
