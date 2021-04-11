@@ -4,9 +4,10 @@ import docker
 import time
 import select
 import json
+import errno
 from threading import Thread, Timer
 
-MAX_CONTAINER_LENGTH = 10 * 60
+MAX_CONTAINER_LENGTH = 30 * 60
 
 BUF_SIZE = 1024
 
@@ -76,8 +77,8 @@ def connection(remote_conn, remote_ip):
                     break
                 except:
                     time.sleep(1)
-            remote_conn.setblocking(0)
-            client_conn.setblocking(0)
+            #remote_conn.setblocking(0)
+            #client_conn.setblocking(0)
 
             sockets = [remote_conn, client_conn]
 
